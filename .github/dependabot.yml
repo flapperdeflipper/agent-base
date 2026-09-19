@@ -1,0 +1,21 @@
+---
+# Dependency bumps for the base image build itself. The add-ons' pins on this
+# image are handled by .github/workflows/update-addons.yml (immediate, on
+# release) — dependabot in the addons repo covers the passive path.
+version: 2
+updates:
+  - package-ecosystem: docker
+    directory: "/"
+    schedule:
+      interval: weekly
+    # base-debian:trixie is a moving tag; only semver pins (node, golang)
+    # produce PRs.
+    labels:
+      - dependencies
+
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+    labels:
+      - dependencies

@@ -1,0 +1,17 @@
+# Git
+.git
+.gitignore
+
+# Documentation (not needed in image)
+*.md
+!rootfs/**/*.md
+
+# Development files
+.editorconfig
+.vscode
+
+# Test infrastructure (not needed in image)
+test/
+
+# CI
+.github/

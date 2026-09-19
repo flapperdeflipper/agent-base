@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+# ==============================================================================
+# skills-update - fast-forward the /opt/skills snapshot baked into the image.
+# The image itself always boots at the pinned SKILLS_REF; this is the
+# interactive escape hatch for picking up skills changes without a rebuild.
+# ==============================================================================
+set -uo pipefail
+
+SKILLS_DIR="${SKILLS_DIR:-/opt/skills}"
+
+log()  { echo "[INFO ] ${*}"; }
+warn() { echo "[WARN ] ${*}" >&2; }
+
+if ! command -v git >/dev/null 2>&1; then
+    warn "git is not available"
+    exit 1
+fi
+
+if [ ! -d "${SKILLS_DIR}/.git" ]; then
+    warn "${SKILLS_DIR} is not a git checkout"
+    exit 1
+fi
+
+if ! git -C "${SKILLS_DIR}" diff --quiet 2>/dev/null \
+    || ! git -C "${SKILLS_DIR}" diff --cached --quiet 2>/dev/null; then
+    warn "${SKILLS_DIR} has local changes - keeping the current checkout"
+    exit 1
+fi
+
+log "Updating ${SKILLS_DIR}"
+if git -C "${SKILLS_DIR}" fetch --prune origin \
+    && git -C "${SKILLS_DIR}" checkout --detach origin/master; then
+    log "Skills now at $(git -C "${SKILLS_DIR}" rev-parse HEAD)"
+    exit 0
+fi
+
+warn "Failed to update skills - keeping the current checkout"
+exit 1

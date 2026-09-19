@@ -1,0 +1,112 @@
+---
+# Build and publish the agent-base image.
+#
+# - pull_request: contract tests + full build as a gate (no push)
+# - push to master: publishes :edge
+# - tag v1.2.3: publishes :1.2.3 and :latest
+#
+# ghcr.io always publishes via the workflow's GITHUB_TOKEN. The optional
+# docker.io mirror (flapperdeflipper/agent-base) activates when the repo
+# variable DOCKERHUB_MIRROR is set to "true" and the DOCKERHUB_USERNAME /
+# DOCKERHUB_PASSWORD secrets exist (same secret names as the addons repo).
+name: Build image
+
+permissions:
+  contents: read
+  packages: write
+  # Keyless cosign signing of the published manifests.
+  id-token: write
+
+on:
+  pull_request:
+    branches: ["master"]
+  push:
+    branches: ["master"]
+    tags: ["v*"]
+
+env:
+  GHCR_IMAGE: ghcr.io/flapperdeflipper/agent-base
+  DOCKERHUB_IMAGE: flapperdeflipper/agent-base
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    name: Contract tests
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Run node contract tests
+        run: node --test
+
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    name: Build and publish
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Compute image tags
+        id: tags
+        run: |
+          MIRROR="${DOCKERHUB_MIRROR_ENABLED}"
+          VERSION_TAGS="${GHCR_IMAGE}:edge"
+          if [[ "${GITHUB_REF}" == refs/tags/v* ]]; then
+            VERSION="${GITHUB_REF#refs/tags/v}"
+            VERSION_TAGS="${GHCR_IMAGE}:${VERSION},${GHCR_IMAGE}:latest"
+            if [[ "${MIRROR}" == "true" ]]; then
+              VERSION_TAGS="${VERSION_TAGS},${DOCKERHUB_IMAGE}:${VERSION},${DOCKERHUB_IMAGE}:latest"
+            fi
+          fi
+          {
+            echo "version_tags<<EOF"
+            echo "${VERSION_TAGS}"
+            echo "EOF"
+            echo "push=$([[ "${GITHUB_EVENT_NAME}" == "pull_request" ]] && echo false || echo true)"
+          } >> "$GITHUB_OUTPUT"
+        env:
+          DOCKERHUB_MIRROR_ENABLED: ${{ vars.DOCKERHUB_MIRROR }}
+
+      - name: Log in to GHCR
+        if: steps.tags.outputs.push == 'true'
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Log in to Docker Hub (optional mirror)
+        if: steps.tags.outputs.push == 'true' && vars.DOCKERHUB_MIRROR == 'true'
+        uses: docker/login-action@v4
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+      - name: Build and push
+        id: build
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/amd64
+          push: ${{ steps.tags.outputs.push == 'true' }}
+          tags: ${{ steps.tags.outputs.version_tags }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Install cosign
+        if: steps.tags.outputs.push == 'true'
+        uses: sigstore/cosign-installer@v3
+
+      # Keyless signing with the workflow's GitHub OIDC identity, the same
+      # pattern the addons repository applies to its published add-on images.
+      # Signs the ghcr.io digest; the docker.io mirror (when enabled) is
+      # unsigned.
+      - name: Sign published image
+        if: steps.tags.outputs.push == 'true'
+        env:
+          DIGEST: ${{ steps.build.outputs.digest }}
+        run: cosign sign --yes "${GHCR_IMAGE}@${DIGEST}"
