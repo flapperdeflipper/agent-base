@@ -54,7 +54,7 @@ jobs:
         run: ../scripts/update-addons.sh "${{ steps.version.outputs.version }}"
 
       - name: Create pull request
-        uses: peter-evans/create-pull-request@v7
+        uses: peter-evans/create-pull-request@v8
         with:
           token: ${{ secrets.ADDONS_REPO_TOKEN }}
           path: addons
