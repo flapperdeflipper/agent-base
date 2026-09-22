@@ -81,40 +81,31 @@ RUN ln -s ../lib/node_modules/npm/bin/npm-cli.js /usr/local/bin/npm \
     && ln -s ../lib/node_modules/npm/bin/npx-cli.js /usr/local/bin/npx \
     && ln -s node /usr/local/bin/nodejs
 
-# Union of the package sets the three add-ons installed individually: editors,
-# shells and completions, archive/compression, network inspection, build tools
-# (kept permanently — native npm fallback builds need them), python venv
-# tooling, and the interactive unix toolset (fzf, bat, zoxide, ...). Apt skips
-# what the base already ships.
+# Curated toolset for the three add-ons, their scripts and the skills
+# snapshot: editors, shells and completions, archive/compression, build
+# tools (kept permanently — native npm fallback builds need them; node-gyp
+# needs only gcc/g++/make + python3), python venv tooling, imagemagick for
+# image work, and the interactive unix toolset (fzf, bat, zoxide, ...).
+# Everything here is referenced by an add-on script or a skill (ffmpeg and
+# imagemagick are kept for media/image work in agent sessions); one-shot
+# heavyweight tools (awscli, nmap, rclone, irssi, ...) and chromium (only the
+# OpenCode screenshot tool launches a browser — it installs its own) were
+# removed in 1.1.0 to keep the shared base small. Apt skips what the base
+# already ships.
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
-        arping \
-        autoconf \
-        automake \
-        awscli \
         bash \
         bash-completion \
         bat \
-        bats \
-        bats-assert \
-        bats-file \
-        bats-support \
-        bc \
         binutils \
-        binwalk \
         bubblewrap \
         bzip2 \
         ca-certificates \
-        chromium \
-        cmake \
-        colordiff \
         coreutils \
         curl \
-        direnv \
-        ffmpeg \
-        figlet \
         file \
         findutils \
+        ffmpeg \
         fzf \
         g++ \
         gawk \
@@ -122,65 +113,43 @@ RUN apt-get update \
         gettext \
         gh \
         git \
-        glab \
         gnupg \
         gnupg2 \
         graphviz \
         grep \
-        grc \
         highlight \
         htop \
-        iftop \
         imagemagick \
-        ipcalc \
-        irssi \
-        jo \
         jq \
         libatomic1 \
         libffi-dev \
         libpcre2-dev \
         libpq-dev \
-        libtool \
         libyaml-dev \
-        links \
         make \
-        moreutils \
-        mtr \
         ncdu \
         netcat-openbsd \
-        ngrep \
-        nmap \
         openssh-client \
         openssl \
         p7zip \
-        pgbadger \
         pigz \
-        pre-commit \
         prettyping \
         procps \
-        progress \
-        psutils \
-        pwgen \
         python3 \
         python3-venv \
         python3-virtualenv \
         python3-virtualenvwrapper \
         python3-yaml \
-        rclone \
         rsync \
         shellcheck \
         sqlite3 \
         stow \
         sudo \
-        swaks \
-        telnet \
         tmux \
-        tofrodos \
         tree \
         unzip \
         vim \
         neovim \
-        w3m \
         wget \
         xz-utils \
         yamllint \
@@ -189,16 +158,12 @@ RUN apt-get update \
     && command -v ssh-keygen >/dev/null \
     && command -v ssh-keyscan >/dev/null \
     && command -v gh >/dev/null \
-    && command -v glab >/dev/null \
     && command -v shellcheck >/dev/null \
     && command -v fzf >/dev/null \
     && test "$(command -v node)" = /usr/local/bin/node \
     && test "$(node --version)" = "v${NODE_VERSION}" \
     && npm --version >/dev/null \
     && rm -rf /var/lib/apt/lists/*
-
-# Chromium path for puppeteer-core (used by screenshot MCP tool)
-ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
 
 # Install ttyd from GitHub releases (not in Debian repos)
 RUN ARCH=$([ "$TARGETARCH" = "arm64" ] && echo "aarch64" || echo "x86_64") \
