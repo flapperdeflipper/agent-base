@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## 1.1.0
+
+- **Removed** — 37 unused apt packages from the shared toolchain (awscli, rclone, nmap, cmake/autoconf/automake/libtool, irssi, w3m, links, glab, direnv, bats, and other one-shot tools): nothing in the three add-ons, their scripts or the skills snapshot invokes them. Cuts ~333 MB installed.
+- **Removed** — chromium (~384 MB net with its Mesa/GTK dependencies) from the shared base. Only the OpenCode add-on's screenshot tool launches a local browser; `ha_opencode` installs its own chromium from its 2.21.0 release, and OpenChamber/Terminal stop shipping it entirely. (The codec/audio libraries stay — ffmpeg keeps them alive.)
+- **Kept** — imagemagick and ffmpeg (media/image work in agent sessions), shellcheck, graphviz (`dot` renders graphs in the writing skills), stow (Terminal dotfiles sync), highlight (LSP server), the gcc/g++/make build toolchain and the full interactive unix toolset.
+
 ## 1.0.0
 
 - **Initial release** — the shared base image for the `ha_opencode`, `ha_openchamber` and `terminal` Home Assistant add-ons, extracted from the toolchain layers those three add-ons each installed independently.

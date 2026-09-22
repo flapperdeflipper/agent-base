@@ -81,6 +81,6 @@ describe("image pins", () => {
   });
 
   it("updates the changelog top section for the current release", () => {
-    assert.match(changelog, /^## 1\.0\.0$/m, "changelog is missing its 1.0.0 section");
+    assert.match(changelog, /^## 1\.1\.0$/m, "changelog is missing its 1.1.0 section");
   });
 });

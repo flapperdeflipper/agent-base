@@ -14,7 +14,7 @@ lives here once; the add-ons layer only their s6 services and app code on top.
 | Base | `ghcr.io/home-assistant/base-debian:trixie` (s6-overlay + Bashio, Supervisor-compatible) |
 | Runtime | Node (exact pin, copied from the official image), npm globals: opencode (certified hard pin), prettier, tsx, ppq-private-mode |
 | CLI tooling | hab, zigporter, yq (mikefarah), 1Password CLI (`op`), cosign, gh, glab, awscli, rclone |
-| Unix toolset | The merged package set of the three add-ons: vim/neovim, tmux, fzf, bat, zoxide, shellcheck, bats, direnv, stow, jq, sqlite3, network inspection (nmap, mtr, ngrep), build toolchain (gcc/g++/make/cmake/autoconf), python venv tooling, archives, chromium |
+| Unix toolset | A curated package set — everything the add-ons and skills actually use: vim/neovim, tmux, fzf, bat, zoxide, shellcheck, stow, jq, sqlite3, imagemagick, ffmpeg, graphviz, build toolchain (gcc/g++/make), python venv tooling, archives. No chromium (ha_opencode ships its own), no one-shot heavyweight tools |
 | ttyd | ttyd + the patched ingress index page at `/opt/ttyd/index.html` (clipboard, touch scrolling, resize-fit) |
 | Skills | [`flapperdeflipper/skills`](https://github.com/flapperdeflipper/skills) snapshot at `/opt/skills`, pinned to a commit (`SKILLS_REF`) |
 
