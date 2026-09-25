@@ -41,12 +41,14 @@ repository).
 
 ## Keeping the pins in sync
 
-Publishing a release (tag `vX.Y.Z`) automatically opens a pull request in
+Publishing a release (tag `vX.Y.Z`) immediately pings the central Renovate
+runner ([`flapperdeflipper/renovate`](https://github.com/flapperdeflipper/renovate),
+`.github/workflows/trigger-renovate.yml`, needs the `RENOVATE_DISPATCH_TOKEN`
+secret). Renovate opens a pull request in
 [`flapperdeflipper/addons`](https://github.com/flapperdeflipper/addons) that
 repoints the three add-ons at the new image version and bumps their patch
-versions and changelogs (`.github/workflows/update-addons.yml`, needs the
-`ADDONS_REPO_TOKEN` secret). Dependabot in the addons repo covers the passive
-path. Dependabot here bumps the build's own pins (Node image, actions).
+versions and changelogs. Renovate also covers this repo's own pins (Node
+image, actions) on its daily run — the former Dependabot config is retired.
 
 ## Skills snapshot
 
