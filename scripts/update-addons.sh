@@ -32,6 +32,14 @@ for addon in ${ADDONS}; do
     sed -i -E "s|^(ARG AGENT_BASE=ghcr\.io/flapperdeflipper/agent-base):.*\$|\1:${VERSION}|" "${dockerfile}"
     yq -i ".args.AGENT_BASE = \"${IMAGE}\"" "${build_yaml}"
 
+    # build_from is consumed by Home Assistant's actions/helpers/info step in
+    # the add-ons' builder CI, so it must move in lockstep with the args pin —
+    # leaving it behind (it sat at 1.0.0 through two roll-ups) makes the file
+    # contradict itself. Update every arch entry that points at agent-base.
+    if [ "$(yq '.build_from != null' "${build_yaml}")" = "true" ]; then
+        yq -i ".build_from |= with_entries(select(.value | test(\"agent-base\")) | .value = \"${IMAGE}\")" "${build_yaml}"
+    fi
+
     # Repo rule: every add-on change ships with a version bump + changelog entry.
     current=$(yq '.version' "${dir}/config.yaml")
     new=$(python3 - "${current}" <<'PY'
