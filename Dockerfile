@@ -45,7 +45,7 @@ ARG NODE_VERSION
 # the image ships exactly one OpenCode build, it is the only one any session
 # can run, and it changes only through a tested release. The pin is asserted
 # against build.yaml by test/pins.test.js so a half-done bump cannot ship.
-ARG OPENCODE_VERSION=1.18.31
+ARG OPENCODE_VERSION=1.18.32
 ARG PPQ_PROXY_VERSION=0.6.0
 ARG TSX_VERSION=4.23.13
 ARG TTYD_VERSION=1.7.7
