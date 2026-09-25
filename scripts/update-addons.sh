@@ -31,6 +31,9 @@ for addon in ${ADDONS}; do
 
     sed -i -E "s|^(ARG AGENT_BASE=ghcr\.io/flapperdeflipper/agent-base):.*\$|\1:${VERSION}|" "${dockerfile}"
     yq -i ".args.AGENT_BASE = \"${IMAGE}\"" "${build_yaml}"
+    # build_from must stay aligned with the Dockerfile ARG (build.yaml's own
+    # header requires it); bump every arch entry.
+    yq -i ".build_from[] = \"${IMAGE}\"" "${build_yaml}"
 
     # build_from is consumed by Home Assistant's actions/helpers/info step in
     # the add-ons' builder CI, so it must move in lockstep with the args pin —
