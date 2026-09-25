@@ -1,9 +1,9 @@
 # agent-base
 
 The shared base container image for the
-[`ha_opencode`](https://github.com/flapperdeflipper/addons/tree/master/ha_opencode),
-[`ha_openchamber`](https://github.com/flapperdeflipper/addons/tree/master/ha_openchamber)
-and [`terminal`](https://github.com/flapperdeflipper/addons/tree/master/terminal)
+[`ha_opencode`](https://github.com/flapperdeflipper/addons/tree/main/ha_opencode),
+[`ha_openchamber`](https://github.com/flapperdeflipper/addons/tree/main/ha_openchamber)
+and [`terminal`](https://github.com/flapperdeflipper/addons/tree/main/terminal)
 Home Assistant add-ons. Everything the three used to install independently
 lives here once; the add-ons layer only their s6 services and app code on top.
 
@@ -31,7 +31,7 @@ FROM ${AGENT_BASE}
 |---|---|
 | `X.Y.Z` | Release builds, published on `vX.Y.Z` git tags |
 | `latest` | Last released version |
-| `edge` | Last push to `master` |
+| `edge` | Last push to `main` |
 
 Images are published to `ghcr.io/flapperdeflipper/agent-base` and cosign-signed
 (keyless). An optional Docker Hub mirror at `flapperdeflipper/agent-base` is

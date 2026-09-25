@@ -2,7 +2,7 @@
 # Build and publish the agent-base image.
 #
 # - pull_request: contract tests + full build as a gate (no push)
-# - push to master: publishes :edge
+# - push to main: publishes :edge
 # - tag v1.2.3: publishes :1.2.3 and :latest
 #
 # ghcr.io always publishes via the workflow's GITHUB_TOKEN. The optional
@@ -19,9 +19,9 @@ permissions:
 
 on:
   pull_request:
-    branches: ["master"]
+    branches: ["main"]
   push:
-    branches: ["master"]
+    branches: ["main"]
     tags: ["v*"]
 
 env:
