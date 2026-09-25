@@ -31,6 +31,9 @@ for addon in ${ADDONS}; do
 
     sed -i -E "s|^(ARG AGENT_BASE=ghcr\.io/flapperdeflipper/agent-base):.*\$|\1:${VERSION}|" "${dockerfile}"
     yq -i ".args.AGENT_BASE = \"${IMAGE}\"" "${build_yaml}"
+    # build_from must stay aligned with the Dockerfile ARG (build.yaml's own
+    # header requires it); bump every arch entry.
+    yq -i ".build_from[] = \"${IMAGE}\"" "${build_yaml}"
 
     # Repo rule: every add-on change ships with a version bump + changelog entry.
     current=$(yq '.version' "${dir}/config.yaml")

@@ -1,6 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## Unreleased
+
+- **Fixed** — CI: tag builds now publish the GitHub release automatically (notes from the matching changelog section). A missing manual release for v1.1.1 left `update-addons.yml` untriggered, so no roll-up PR opened in `flapperdeflipper/addons`.
+- **Fixed** — `update-addons.sh` now also bumps the `build_from` pins in the add-ons' `build.yaml`, which had stayed at 1.0.0 through the 1.1.0 and 1.1.1 roll-ups.
+
 ## 1.1.1
 
 - **Changed** — certified OpenCode runtime bumped 1.18.31 → 1.18.32 (upstream patch release, 2026-09-21). No other pin changes.

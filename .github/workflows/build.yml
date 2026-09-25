@@ -3,7 +3,8 @@
 #
 # - pull_request: contract tests + full build as a gate (no push)
 # - push to main: publishes :edge
-# - tag v1.2.3: publishes :1.2.3 and :latest
+# - tag v1.2.3: publishes :1.2.3 and :latest, then the GitHub release
+#   (whose publication triggers update-addons.yml for the roll-up PR)
 #
 # ghcr.io always publishes via the workflow's GITHUB_TOKEN. The optional
 # docker.io mirror (flapperdeflipper/agent-base) activates when the repo
@@ -12,7 +13,9 @@
 name: Build image
 
 permissions:
-  contents: read
+  # Publishing the GitHub release on tag builds; release: published is what
+  # triggers update-addons.yml in this repo.
+  contents: write
   packages: write
   # Keyless cosign signing of the published manifests.
   id-token: write
@@ -110,3 +113,23 @@ jobs:
         env:
           DIGEST: ${{ steps.build.outputs.digest }}
         run: cosign sign --yes "${GHCR_IMAGE}@${DIGEST}"
+
+      # Publish the GitHub release for tag builds. release: published is what
+      # triggers update-addons.yml to open the roll-up PR in
+      # flapperdeflipper/addons; before this step existed the release was a
+      # manual step (missed for v1.1.1, so no roll-up PR appeared). Runs last
+      # so the release only exists once the image is pushed and signed.
+      # Idempotent: an already-existing release (e.g. created by hand) wins.
+      - name: Publish GitHub release
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view "${GITHUB_REF_NAME}" >/dev/null 2>&1; then
+            echo "Release ${GITHUB_REF_NAME} already exists, skipping"
+            exit 0
+          fi
+          VERSION="${GITHUB_REF#refs/tags/v}"
+          NOTES=$(awk -v ver="## ${VERSION}" '$0 == ver {found=1; next} /^## / && found {exit} found {print}' CHANGELOG.md)
+          [ -n "${NOTES}" ] || NOTES="agent-base ${VERSION}"
+          gh release create "${GITHUB_REF_NAME}" --title "agent-base ${VERSION}" --notes "${NOTES}"
