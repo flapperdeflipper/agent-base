@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## 1.1.1
+
+- **Changed** — certified OpenCode runtime bumped 1.18.31 → 1.18.32 (upstream patch release, 2026-09-21). No other pin changes.
+
 ## 1.1.0
 
 - **Removed** — 37 unused apt packages from the shared toolchain (awscli, rclone, nmap, cmake/autoconf/automake/libtool, irssi, w3m, links, glab, direnv, bats, and other one-shot tools): nothing in the three add-ons, their scripts or the skills snapshot invokes them. Cuts ~333 MB installed.
