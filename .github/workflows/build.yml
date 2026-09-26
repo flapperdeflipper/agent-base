@@ -102,7 +102,7 @@ jobs:
 
       - name: Install cosign
         if: steps.tags.outputs.push == 'true'
-        uses: sigstore/cosign-installer@v3
+        uses: sigstore/cosign-installer@v4.1.2
 
       # Keyless signing with the workflow's GitHub OIDC identity, the same
       # pattern the addons repository applies to its published add-on images.
