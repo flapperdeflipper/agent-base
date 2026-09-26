@@ -37,6 +37,7 @@ describe("image pins", () => {
       "YQ_VERSION",
       "OP_CLI_VERSION",
       "COSIGN_VERSION",
+      "DAGU_VERSION",
       "HAB_VERSION",
     ]) {
       const pin = arg(name);
