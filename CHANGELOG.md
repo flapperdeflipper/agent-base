@@ -3,6 +3,7 @@ All notable changes to this project will be documented in this file.
 
 ## Unreleased
 
+- **Added** — Dagu CLI (`dagu`, pinned 2.17.2, checksum-verified) for writing and validating DAGs in agent sessions and for driving the Dagu server on hd through a remote CLI context (`dagu context add`). Pinned to the server's version and bumped by hand together with it, since Dagu 2.x ships breaking CLI/API changes. Adds ~160 MB (the binary embeds its web UI).
 - **Fixed** — CI: tag builds now publish the GitHub release automatically (notes from the matching changelog section). A missing manual release for v1.1.1 left `update-addons.yml` untriggered, so no roll-up PR opened in `flapperdeflipper/addons`.
 - **Fixed** — `update-addons.sh` now also bumps the `build_from` pins in the add-ons' `build.yaml`, which had stayed at 1.0.0 through the 1.1.0 and 1.1.1 roll-ups.
 

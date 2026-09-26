@@ -4,9 +4,9 @@
 #
 # Everything the three add-ons used to install independently lives here once:
 # the exact Node toolchain, the full CLI/unix toolset, opencode (certified
-# pin), hab, zigporter, ttyd (+ the patched ingress page), yq, the 1Password
-# and cosign CLIs, and a pinned snapshot of the skills repo. The add-ons layer
-# only their s6 services and app code on top.
+# pin), hab, zigporter, ttyd (+ the patched ingress page), yq, the 1Password,
+# cosign and Dagu CLIs, and a pinned snapshot of the skills repo. The add-ons
+# layer only their s6 services and app code on top.
 #
 # The Home Assistant s6/Bashio base is kept as the final stage so add-ons
 # built FROM this image stay Supervisor-compatible.
@@ -57,6 +57,10 @@ ARG OP_CLI_VERSION=2.39.0
 # sigstore cosign, for OCI image signing/verification from agent sessions —
 # the same tool CI uses to keyless-sign the published images.
 ARG COSIGN_VERSION=v3.1.3
+# Dagu CLI, for authoring/validating DAGs and driving the Dagu server on hd
+# through a remote CLI context. Kept at the server's version: Dagu 2.x ships
+# breaking CLI/API changes, so the two are bumped together, by hand.
+ARG DAGU_VERSION=2.17.2
 # Snapshot of the skills repo baked into /opt/skills. Hard-pinned commit: the
 # image is rebuilt (and the add-ons follow via the update MR automation) to
 # pick up skills changes; a moving ref here would make builds unreproducible.
@@ -202,6 +206,22 @@ RUN ARCH=$([ "$TARGETARCH" = "arm64" ] && echo "arm64" || echo "amd64") \
     && curl -fsSL "https://github.com/sigstore/cosign/releases/download/${COSIGN_VERSION}/cosign-linux-${ARCH}" -o /usr/local/bin/cosign \
     && chmod +x /usr/local/bin/cosign \
     && cosign version 2>/dev/null | grep -q "GitVersion:.*${COSIGN_VERSION}"
+
+# Install the Dagu CLI from GitHub releases: `dagu validate`/`dagu dry` for DAGs
+# written in agent sessions, and `dagu context add` + `dagu start/status/history`
+# against the Dagu server. Release asset names use Go arch (amd64/arm64). The
+# archive is verified against the release's checksums.txt, and the trailing
+# version assertion fails the build on a truncated/HTML-error download. The
+# binary is ~160 MB: the web UI is embedded and cannot be left out.
+RUN ARCH=$([ "$TARGETARCH" = "arm64" ] && echo "arm64" || echo "amd64") \
+    && ASSET="dagu_${DAGU_VERSION}_linux_${ARCH}.tar.gz" \
+    && URL="https://github.com/dagucloud/dagu/releases/download/v${DAGU_VERSION}" \
+    && curl -fsSL "${URL}/${ASSET}" -o "/tmp/${ASSET}" \
+    && curl -fsSL "${URL}/checksums.txt" -o /tmp/dagu-checksums.txt \
+    && (cd /tmp && grep " ${ASSET}\$" dagu-checksums.txt | sha256sum -c --quiet -) \
+    && tar -xzf "/tmp/${ASSET}" -C /usr/local/bin dagu \
+    && rm -f "/tmp/${ASSET}" /tmp/dagu-checksums.txt \
+    && [ "$(dagu version)" = "${DAGU_VERSION}" ]
 
 # Copy hab CLI binary built from source (pinned release)
 # A CLI designed for AI agents to manage HA via REST/WebSocket APIs
