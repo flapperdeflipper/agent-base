@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## Unreleased
+
+- **Fixed** — CI: tag builds ping the Renovate runner directly for the AGENT_BASE roll-up PR in `flapperdeflipper/addons`. The previous `release: published` hop never fired: the release is published with this workflow's own `GITHUB_TOKEN`, and GITHUB_TOKEN-caused events never trigger other workflows — so v1.2.0 shipped with no roll-up PR and had to be bumped by hand (addons#192). `trigger-renovate.yml` stays for hand-published releases and manual pings.
+
 ## 1.2.0
 
 - **Added** — Dagu CLI (`dagu`, pinned 2.17.2, checksum-verified) for writing and validating DAGs in agent sessions and for driving the Dagu server on hd through a remote CLI context (`dagu context add`). Pinned to the server's version and bumped by hand together with it, since Dagu 2.x ships breaking CLI/API changes. Adds ~160 MB (the binary embeds its web UI).
