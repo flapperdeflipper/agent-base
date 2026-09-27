@@ -1,11 +1,14 @@
 ---
-# Ping the central Renovate runner (flapperdeflipper/renovate) whenever an
-# agent-base release is published. Renovate then opens a PR in
-# flapperdeflipper/addons that repins the layered add-ons (ha_opencode,
-# ha_openchamber, terminal) at the new image version and bumps their
-# config.yaml versions + changelogs via the post-upgrade task there.
-# Replaces the former update-addons.yml roll-up (retired: Renovate owns the
-# flow now).
+# Ping the central Renovate runner (flapperdeflipper/renovate). Renovate then
+# opens a PR in flapperdeflipper/addons that repins the layered add-ons
+# (ha_opencode, ha_openchamber, terminal) at the new image version and bumps
+# their config.yaml versions + changelogs via the post-upgrade task there.
+#
+# NOTE: tag builds do NOT rely on this workflow — build.yml pings Renovate
+# directly after publishing the release, because that release is published
+# with the workflow's GITHUB_TOKEN and GITHUB_TOKEN-caused events never
+# trigger other workflows. This workflow covers releases published by hand
+# (human/PAT tokens do fire events) and manual pings via workflow_dispatch.
 name: Trigger Renovate
 
 permissions:
