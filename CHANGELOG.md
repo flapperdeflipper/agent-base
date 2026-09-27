@@ -1,7 +1,7 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-## Unreleased
+## 1.2.1
 
 - **Fixed** — CI: tag builds ping the Renovate runner directly for the AGENT_BASE roll-up PR in `flapperdeflipper/addons`. The previous `release: published` hop never fired: the release is published with this workflow's own `GITHUB_TOKEN`, and GITHUB_TOKEN-caused events never trigger other workflows — so v1.2.0 shipped with no roll-up PR and had to be bumped by hand (addons#192). `trigger-renovate.yml` stays for hand-published releases and manual pings.
 
