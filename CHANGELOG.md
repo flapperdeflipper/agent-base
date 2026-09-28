@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## 1.2.2
+
+- **Changed** — skills snapshot bumped `e0b689e` → `d7af437` (flapperdeflipper/skills#46): the `dagu` skill gains `references/house.md` (this home's automation-suite setup: server/workers, DAGs in git, CLI context with the `/api/v1` API base URL, MCP, REST, SSH) and the new `nodered` skill (the stack's Node-RED: MCP workflow, MQTT/HA/GitHub/Dagu wiring). No toolchain changes.
+
 ## 1.2.1
 
 - **Fixed** — CI: tag builds ping the Renovate runner directly for the AGENT_BASE roll-up PR in `flapperdeflipper/addons`. The previous `release: published` hop never fired: the release is published with this workflow's own `GITHUB_TOKEN`, and GITHUB_TOKEN-caused events never trigger other workflows — so v1.2.0 shipped with no roll-up PR and had to be bumped by hand (addons#192). `trigger-renovate.yml` stays for hand-published releases and manual pings.
