@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## 1.2.3
+
+- **Changed** — skills snapshot bumped `d7af437` → `e533794` (flapperdeflipper/skills#47): house facts in the `dagu` reference (agents use the `agents-cli` key via `DAGU_API_TOKEN` / CLI context `hd`; deploy DAGs are webhook-triggered with a slow fallback schedule) and in `nodered` (use the existing `Home Assistant (ha)` and `Mosquitto (ha)` config nodes). No toolchain changes.
+
 ## 1.2.2
 
 - **Changed** — skills snapshot bumped `e0b689e` → `d7af437` (flapperdeflipper/skills#46): the `dagu` skill gains `references/house.md` (this home's automation-suite setup: server/workers, DAGs in git, CLI context with the `/api/v1` API base URL, MCP, REST, SSH) and the new `nodered` skill (the stack's Node-RED: MCP workflow, MQTT/HA/GitHub/Dagu wiring). No toolchain changes.
