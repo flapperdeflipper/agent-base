@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## 1.2.4
+
+- **Changed** — skills snapshot bumped `e533794` → `0d64d79` (flapperdeflipper/skills#49): no internal IPs in the house docs (host names instead); the `dagu` house reference and the `nodered` skill describe the event-driven automation suite (no job schedules, workflow scripts shipped via `dependencies` + CI, read-only checkouts on the workers, Node-RED deploys exported to git automatically). No toolchain changes.
+
 ## 1.2.3
 
 - **Changed** — skills snapshot bumped `d7af437` → `e533794` (flapperdeflipper/skills#47): house facts in the `dagu` reference (agents use the `agents-cli` key via `DAGU_API_TOKEN` / CLI context `hd`; deploy DAGs are webhook-triggered with a slow fallback schedule) and in `nodered` (use the existing `Home Assistant (ha)` and `Mosquitto (ha)` config nodes). No toolchain changes.
