@@ -64,7 +64,7 @@ ARG DAGU_VERSION=2.17.2
 # Snapshot of the skills repo baked into /opt/skills. Hard-pinned commit: the
 # image is rebuilt (and the add-ons follow via the update MR automation) to
 # pick up skills changes; a moving ref here would make builds unreproducible.
-ARG SKILLS_REF=e0b689eddc43d117a0fa3f4d303963f4fa7957b1
+ARG SKILLS_REF=d7af437e5fe403c1404125fe9a3f8fb4ab675d64
 
 # Environment for better Node.js performance
 ENV NODE_ENV=production \
