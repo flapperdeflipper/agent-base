@@ -41,11 +41,12 @@ FROM ${BUILD_FROM}
 # Build arguments
 ARG TARGETARCH
 ARG NODE_VERSION
-# Certified OpenCode runtime. This is a hard pin, never a range or a dist-tag:
-# the image ships exactly one OpenCode build, it is the only one any session
-# can run, and it changes only through a tested release. The pin is asserted
-# against build.yaml by test/pins.test.js so a half-done bump cannot ship.
-ARG OPENCODE_VERSION=1.18.32
+# Certified OpenCode 2 runtime (npm package @opencode/cli; OpenCode 1 lived in
+# opencode-ai). This is a hard pin, never a range or a dist-tag: the image
+# ships exactly one OpenCode build, it is the only one any session can run,
+# and it changes only through a tested release. The pin is asserted by
+# test/pins.test.js so a half-done bump cannot ship.
+ARG OPENCODE_VERSION=2.0.29
 ARG PPQ_PROXY_VERSION=0.6.0
 ARG TSX_VERSION=4.23.13
 ARG TTYD_VERSION=1.7.7
@@ -247,28 +248,27 @@ RUN python3 -m venv /opt/zigporter-venv \
 # surface for the first time on a user's machine. The version is also recorded
 # on disk so runtime code can name the certified build without shelling out.
 RUN npm install -g --omit=dev --omit=peer --no-audit --no-fund \
-        opencode-ai@${OPENCODE_VERSION} \
+        @opencode/cli@${OPENCODE_VERSION} \
         prettier \
         ppq-private-mode@${PPQ_PROXY_VERSION} \
         tsx@${TSX_VERSION} \
     && npm cache clean --force \
-    && INSTALLED=$(node -e "console.log(require('/usr/local/lib/node_modules/opencode-ai/package.json').version)") \
+    && INSTALLED=$(node -e "console.log(require('/usr/local/lib/node_modules/@opencode/cli/package.json').version)") \
     && if [ "${INSTALLED}" != "${OPENCODE_VERSION}" ]; then \
         echo "OPENCODE_VERSION is ${OPENCODE_VERSION} but the installed runtime is ${INSTALLED}" >&2; \
         exit 1; \
     fi \
     && printf '%s\n' "${OPENCODE_VERSION}" > /usr/local/share/opencode-certified-version \
-    && OPENCODE_ARCH=$([ "${TARGETARCH}" = "arm64" ] && echo "arm64" || echo "x64") \
-    && if [ "${OPENCODE_ARCH}" = "arm64" ]; then \
-        find /usr/local/lib/node_modules/opencode-ai/node_modules -mindepth 1 -maxdepth 1 -type d \
-            ! -name "opencode-linux-arm64" -exec rm -rf {} +; \
+    && if [ "${TARGETARCH}" = "arm64" ]; then \
+        find /usr/local/lib/node_modules/@opencode -mindepth 1 -maxdepth 1 -type d \
+            ! -name "cli" ! -name "cli-linux-arm64" -exec rm -rf {} +; \
     else \
-        find /usr/local/lib/node_modules/opencode-ai/node_modules -mindepth 1 -maxdepth 1 -type d \
-            ! -name "opencode-linux-x64" ! -name "opencode-linux-x64-baseline" -exec rm -rf {} +; \
+        find /usr/local/lib/node_modules/@opencode -mindepth 1 -maxdepth 1 -type d \
+            ! -name "cli" ! -name "cli-linux-x64" ! -name "cli-linux-x64-baseline" -exec rm -rf {} +; \
     fi \
     && rm -rf /usr/local/lib/node_modules/ppq-private-mode/node_modules/openclaw \
     && find /usr/local/lib/node_modules -type f \( -name '*.d.ts' -o -name '*.map' -o -name '*.pdb' \) -delete \
-    && test "$(opencode --version)" = "${OPENCODE_VERSION}"
+    && test "$(opencode --version)" = "opencode v${OPENCODE_VERSION}"
 
 # Skills repo snapshot at /opt/skills, pinned to SKILLS_REF (see ARG above).
 # Refresh interactively with `skills-update`, or bump the pin and release.

@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## 1.3.0
+
+- **Changed** — certified OpenCode runtime bumped 1.18.32 → **2.0.29** (OpenCode 2). The npm package moves from `opencode-ai` to `@opencode/cli` (the OpenCode 2 distribution; `opencode upgrade --major` installs the same). The `opencode` bin is unchanged; `opencode --version` now prints `opencode v<semver>`, so the build-time certification assertion matches the new format.
+- **Changed** — the per-arch binary prune now walks the `@opencode/*` scope siblings (OpenCode 2 ships its platform binaries — including 201 MB musl and foreign-arch variants — as optional-dependency siblings of `@opencode/cli`), keeping the glibc packages for the target arch only. Expect the image to grow: OpenCode 2 ships a ~200 MB bun-compiled binary per variant.
+- **Behavior notes for the add-ons on this base** — OpenCode 2 no longer reads `CLAUDE.md` (project instructions must live in `AGENTS.md`), hot-reloads `opencode.json`/skills/agents/MCP wiring without a restart, and speaks the V2 server API that current clients' server-connection health probe expects. OpenChamber 2.x requires this runtime (≥ 2.0.15).
+
 ## 1.2.4
 
 - **Changed** — skills snapshot bumped `e533794` → `0d64d79` (flapperdeflipper/skills#49): no internal IPs in the house docs (host names instead); the `dagu` house reference and the `nodered` skill describe the event-driven automation suite (no job schedules, workflow scripts shipped via `dependencies` + CI, read-only checkouts on the workers, Node-RED deploys exported to git automatically). No toolchain changes.
